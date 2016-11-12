@@ -222,3 +222,30 @@ _:-ms-input-placeholder, :root .demo-graph {
       -ms-flex-align: center;
           align-items: center;
 }
+
+#landing {
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: #eee;
+  position: fixed;
+  z-index: 9999;
+  text-align: center;
+}
+
+.demo-card-wide.mdl-card {
+  width: 512px;
+  margin: 50px auto;
+}
+.demo-card-wide > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('images/welcome_card.jpg') center / cover;
+}
+.demo-card-wide > .mdl-card__menu {
+  color: #fff;
+}
+
+.error-message {
+  color: #F44336;
+  display: block;
+}
