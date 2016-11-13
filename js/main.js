@@ -149,6 +149,8 @@ function firebaseLogout() {
 		document.querySelector('#profile-id').innerHTML = "";
 		document.querySelector('#profile-groupid').innerHTML = "";
 		document.querySelector('#profile-chart').innerHTML = '<h4>Financial History:</h4>';
+		document.querySelector('#group-chart').innerHTML = '<h4>Communal Financial History:</h4>';
+		document.querySelector("#group-members").innerHTML ='';
 		var snackbarData = {
 			message: 'Logout Successful',
 			timeout: 2000
@@ -217,7 +219,6 @@ window.onload = function() {
 		document.querySelector('#profile-id').innerHTML = userData.ID;
 		document.querySelector('#profile-groupid').innerHTML = userData.Group_ID;
 		document.querySelector('#group-id').innerHTML = userData.Group_ID;
-		console.log(userData);
 		drawProfileGraphs();
 		fillGroupInfo(userData);
 		if (isReal(userData.userName)) {
@@ -240,7 +241,7 @@ window.onload = function() {
 	}
 }
 
-var months = ["October-14", "November-14", "December-14", "January-15", "February-15", "March-15", "April-15", "May-15", "June-15", "July-15", "August-15", "September-15", "October-15", "November-15", "December-15", "January-16", "February-16", "March-16", "April-16", "May-16", "June-16", "July-16", "August-16", "September-16"];
+var months = ["Oct-14", "Nov-14", "Dec-14", "Jan-15", "Feb-15", "Mar-15", "Apr-15", "May-15", "Jun-15", "Jul-15", "Aug-15", "Sep-15", "Oct-15", "Nov-15", "Dec-15", "Jan-16", "Feb-16", "Mar-16", "Apr-16", "May-16", "Jun-16", "Jul-16", "Aug-16", "Sep-16"];
 
 function drawProfileGraphs() {
 	var svg = dimple.newSvg("#profile-chart", 590, 400);
@@ -272,7 +273,7 @@ function drawProfileGraphs() {
 	var chart = new dimple.chart(svg, data);
 	chart.setBounds(60, 30, 505, 305);
 	var x = chart.addCategoryAxis("x", "Month");
-	x.addOrderRule("Date");
+	x.addOrderRule(months);
 	var y = chart.addMeasureAxis("y", "Dollars");
 	//y.overrideMax = 1.5;
 	chart.addSeries("Type", dimple.plot.line);
@@ -306,53 +307,54 @@ function fillGroupInfo(userData) {
 					});
 			    }
 			}
-			console.log(groupMembers);
 			var groupData = {
 				"Earnings": Array(24).fill(0),
 				"Expenses": Array(24).fill(0)
 			};
-			for (var i = 0; i < groupMembers.length; i++) {
-				for (var j = 0; j < 24; j++) {
-					groupData.Earnings[j] += groupMembers[i].Earnings[j];
-					groupData.Expenses[j] += groupMembers[i].Expenses[j];
+			setTimeout(function(){
+				for (var i = 0; i < groupMembers.length; i++) {
+					for (var j = 0; j < 24; j++) {
+						groupData.Earnings[j] += groupMembers[i].Earnings[j];
+						groupData.Expenses[j] += groupMembers[i].Expenses[j];
+					}
 				}
-			}
-			console.log(groupData)
-			var svg = dimple.newSvg("#group-chart", 590, 400);
-			var data = [];
-			for (var i = 0; i < groupData.Earnings.length; i++) {
-				var monthData = {
-					"Month": months[i],
-					"Dollars": groupData.Earnings[i],
-					"Type": "Earnings"
-				};
-				data.push(monthData);
-			}
-			for (var i = 0; i < groupData.Earnings.length; i++) {
-				var monthData2 = {
-					"Month": months[i],
-					"Dollars": groupData.Expenses[i],
-					"Type": "Expenses"
-				};
-				data.push(monthData2);
-			}
-			for (var i = 0; i < groupData.Earnings.length; i++) {
-				var monthData3 = {
-					"Month": months[i],
-					"Dollars": groupData.Earnings[i] - userData.Expenses[i],
-					"Type": "Net"
-				};
-				data.push(monthData3);
-			}
-			var chart = new dimple.chart(svg, data);
-			chart.setBounds(60, 30, 505, 305);
-			var x = chart.addCategoryAxis("x", "Month");
-			x.addOrderRule("Date");
-			var y = chart.addMeasureAxis("y", "Dollars");
-			//y.overrideMax = 1.5;
-			chart.addSeries("Type", dimple.plot.line);
-			chart.addLegend(60, 10, 500, 20, "right");
-			chart.draw();
+				var svg = dimple.newSvg("#group-chart", 590, 400);
+				var data = [];
+				for (var i = 0; i < groupData.Earnings.length; i++) {
+					var monthData = {
+						"Month": months[i],
+						"Dollars": groupData.Earnings[i],
+						"Type": "Earnings"
+					};
+					data.push(monthData);
+				}
+				for (var i = 0; i < groupData.Earnings.length; i++) {
+					var monthData2 = {
+						"Month": months[i],
+						"Dollars": groupData.Expenses[i],
+						"Type": "Expenses"
+					};
+					data.push(monthData2);
+				}
+				for (var i = 0; i < groupData.Earnings.length; i++) {
+					var monthData3 = {
+						"Month": months[i],
+						"Dollars": groupData.Earnings[i] - groupData.Expenses[i],
+						"Type": "Net"
+					};
+					data.push(monthData3);
+				}
+				//console.log(data)
+				var chart = new dimple.chart(svg, data);
+				chart.setBounds(60, 30, 505, 305);
+				var x = chart.addCategoryAxis("x", "Month");
+				x.addOrderRule(months);
+				var y = chart.addMeasureAxis("y", "Dollars");
+				//y.overrideMax = 1.5;
+				chart.addSeries("Type", dimple.plot.line);
+				chart.addLegend(60, 10, 500, 20, "right");
+				chart.draw();
+			}, 2500);
 		}
 	}).catch(function(error){
 		console.error(error);
