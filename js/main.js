@@ -54,7 +54,7 @@ function validateEmail(email) {
 
 function firebaseLogin() {
 	var email = document.querySelector('#email').value;
-	database.ref('users/' + email.replace(/[@.]/g, "")).once('value').then(function(snapshot){
+	database.ref('emails/' + email.replace(/[@.]/g, "")).once('value').then(function(snapshot){
 		userData = snapshot.val();
 		if (userData === null) {
 			document.querySelector('.error-message').innerHTML = 'That account does not exist.';
@@ -74,7 +74,7 @@ function firebaseLogin() {
 						message: 'Login Successful',
 						timeout: 2000
 					};
-					snackbarContainer.MaterialSnackbar.showSnackbar(snackbarData);
+					document.querySelector('#snackbar').MaterialSnackbar.showSnackbar(snackbarData);
 					document.querySelector('#email').value ='';
 					document.querySelector('#password').value ='';
 					document.querySelector('.error-message').innerHTML = '';
@@ -128,7 +128,7 @@ function firebaseLogout() {
 			message: 'Logout Successful',
 			timeout: 2000
 		  };
-		snackbarContainer.MaterialSnackbar.showSnackbar(snackbarData);
+		document.querySelector('#snackbar').MaterialSnackbar.showSnackbar(snackbarData);
 		window.localStorage.setItem("user", null);
 		window.localStorage.setItem("userData", null);
 	}, function(error) {
@@ -136,7 +136,7 @@ function firebaseLogout() {
 			message: 'Logout Unsuccessful',
 			timeout: 2000
 		  };
-		snackbarContainer.MaterialSnackbar.showSnackbar(snackbarData);
+		document.querySelector('#snackbar').MaterialSnackbar.showSnackbar(snackbarData);
 		console.error(error);
 	});
 }
