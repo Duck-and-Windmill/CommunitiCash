@@ -109,6 +109,7 @@ function firebaseLogin() {
 							document.querySelector('#profile-id').innerHTML = userData.ID;
 							document.querySelector('#profile-groupid').innerHTML = userData.Group_ID;
 							drawProfileGraphs();
+							fillGroupInfo(userData);
 							window.localStorage.setItem("user", JSON.stringify(user));
 							window.localStorage.setItem("userData", JSON.stringify(userData));
 						}
@@ -218,6 +219,7 @@ window.onload = function() {
 		document.querySelector('#group-id').innerHTML = userData.Group_ID;
 		console.log(userData);
 		drawProfileGraphs();
+		fillGroupInfo(userData);
 		if (isReal(userData.userName)) {
 			document.querySelector('#user-name').innerHTML = userData.userName;
 		} else if (isReal(user.Email)) {
@@ -276,4 +278,83 @@ function drawProfileGraphs() {
 	chart.addSeries("Type", dimple.plot.line);
 	chart.addLegend(60, 10, 500, 20, "right");
 	chart.draw();
+}
+
+var groupMembers = [];
+
+function fillGroupInfo(userData) {
+	database.ref('groups/' + userData.Group_ID).once('value').then(function(snapshot){
+		group = snapshot.val();
+		if (group === null) {
+			alert("oh shit");
+		} else {
+			for (var user in group) {
+			    if (group.hasOwnProperty(user)) {
+			        database.ref('users/' + group[user]).once('value').then(function(snapshot){
+						memberData = snapshot.val();
+						if (memberData === null) {
+							alert("oh shit");
+						} else {
+							var ul = document.querySelector("#group-members");
+							var li = document.createElement("li");
+							li.appendChild(document.createTextNode(memberData.Email));
+							ul.appendChild(li);
+							groupMembers.push(memberData);
+						}
+					}).catch(function(error){
+						console.error(error);
+					});
+			    }
+			}
+			console.log(groupMembers);
+			var groupData = {
+				"Earnings": Array(24).fill(0),
+				"Expenses": Array(24).fill(0)
+			};
+			for (var i = 0; i < groupMembers.length; i++) {
+				for (var j = 0; j < 24; j++) {
+					groupData.Earnings[j] += groupMembers[i].Earnings[j];
+					groupData.Expenses[j] += groupMembers[i].Expenses[j];
+				}
+			}
+			console.log(groupData)
+			var svg = dimple.newSvg("#group-chart", 590, 400);
+			var data = [];
+			for (var i = 0; i < groupData.Earnings.length; i++) {
+				var monthData = {
+					"Month": months[i],
+					"Dollars": groupData.Earnings[i],
+					"Type": "Earnings"
+				};
+				data.push(monthData);
+			}
+			for (var i = 0; i < groupData.Earnings.length; i++) {
+				var monthData2 = {
+					"Month": months[i],
+					"Dollars": groupData.Expenses[i],
+					"Type": "Expenses"
+				};
+				data.push(monthData2);
+			}
+			for (var i = 0; i < groupData.Earnings.length; i++) {
+				var monthData3 = {
+					"Month": months[i],
+					"Dollars": groupData.Earnings[i] - userData.Expenses[i],
+					"Type": "Net"
+				};
+				data.push(monthData3);
+			}
+			var chart = new dimple.chart(svg, data);
+			chart.setBounds(60, 30, 505, 305);
+			var x = chart.addCategoryAxis("x", "Month");
+			x.addOrderRule("Date");
+			var y = chart.addMeasureAxis("y", "Dollars");
+			//y.overrideMax = 1.5;
+			chart.addSeries("Type", dimple.plot.line);
+			chart.addLegend(60, 10, 500, 20, "right");
+			chart.draw();
+		}
+	}).catch(function(error){
+		console.error(error);
+	});
 }
