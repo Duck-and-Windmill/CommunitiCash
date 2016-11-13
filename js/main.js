@@ -103,6 +103,12 @@ function firebaseLogin() {
 							} else {
 								document.querySelector('#propic').src = 'images/user.jpg'
 							}
+							document.querySelector('#profile-name').innerHTML = userData.userName.toTitleCase();
+							document.querySelector('#profile-email').innerHTML = userData.Email;
+							document.querySelector('#profile-zip').innerHTML = userData.Zip;
+							document.querySelector('#profile-id').innerHTML = userData.ID;
+							document.querySelector('#profile-groupid').innerHTML = userData.Group_ID;
+							drawProfileGraphs();
 							window.localStorage.setItem("user", JSON.stringify(user));
 							window.localStorage.setItem("userData", JSON.stringify(userData));
 						}
@@ -136,6 +142,12 @@ function firebaseLogout() {
 		document.querySelector('#propic').src = "images/user.jpg";
 		removeClass(document.querySelector('#nav-login'), 'hidden');
 		addClass(document.querySelector('#nav-logout'), 'hidden');
+		document.querySelector('#profile-name').innerHTML = "";
+		document.querySelector('#profile-email').innerHTML = "";
+		document.querySelector('#profile-zip').innerHTML = "";
+		document.querySelector('#profile-id').innerHTML = "";
+		document.querySelector('#profile-groupid').innerHTML = "";
+		document.querySelector('#profile-chart').innerHTML = '<h4>Financial History:</h4>';
 		var snackbarData = {
 			message: 'Logout Successful',
 			timeout: 2000
@@ -203,7 +215,9 @@ window.onload = function() {
 		document.querySelector('#profile-zip').innerHTML = userData.Zip;
 		document.querySelector('#profile-id').innerHTML = userData.ID;
 		document.querySelector('#profile-groupid').innerHTML = userData.Group_ID;
+		document.querySelector('#group-id').innerHTML = userData.Group_ID;
 		console.log(userData);
+		drawProfileGraphs();
 		if (isReal(userData.userName)) {
 			document.querySelector('#user-name').innerHTML = userData.userName;
 		} else if (isReal(user.Email)) {
@@ -222,4 +236,44 @@ window.onload = function() {
 		addClass(document.querySelector('#nav-login'), 'hidden');
 		removeClass(document.querySelector('#nav-logout'), 'hidden');
 	}
+}
+
+var months = ["October-14", "November-14", "December-14", "January-15", "February-15", "March-15", "April-15", "May-15", "June-15", "July-15", "August-15", "September-15", "October-15", "November-15", "December-15", "January-16", "February-16", "March-16", "April-16", "May-16", "June-16", "July-16", "August-16", "September-16"];
+
+function drawProfileGraphs() {
+	var svg = dimple.newSvg("#profile-chart", 590, 400);
+	var data = [];
+	for (var i = 0; i < userData.Earnings.length; i++) {
+		var monthData = {
+			"Month": months[i],
+			"Dollars": userData.Earnings[i],
+			"Type": "Earnings"
+		};
+		data.push(monthData);
+	}
+	for (var i = 0; i < userData.Earnings.length; i++) {
+		var monthData2 = {
+			"Month": months[i],
+			"Dollars": userData.Expenses[i],
+			"Type": "Expenses"
+		};
+		data.push(monthData2);
+	}
+	for (var i = 0; i < userData.Earnings.length; i++) {
+		var monthData3 = {
+			"Month": months[i],
+			"Dollars": userData.Earnings[i] - userData.Expenses[i],
+			"Type": "Net"
+		};
+		data.push(monthData3);
+	}
+	var chart = new dimple.chart(svg, data);
+	chart.setBounds(60, 30, 505, 305);
+	var x = chart.addCategoryAxis("x", "Month");
+	x.addOrderRule("Date");
+	var y = chart.addMeasureAxis("y", "Dollars");
+	//y.overrideMax = 1.5;
+	chart.addSeries("Type", dimple.plot.line);
+	chart.addLegend(60, 10, 500, 20, "right");
+	chart.draw();
 }

@@ -27,6 +27,9 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//code.getmdl.io/1.2.1/material.cyan-light_blue.min.css">
     <link rel="stylesheet" href="styles.css">
+
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="//dimplejs.org/dist/dimple.v2.1.6.min.js"></script>
   </head>
   <body>
 	<div id="landing">
@@ -93,9 +96,12 @@
             <h4>Zip: <span id="profile-zip"></span></h5>
             <h5>ID: <span id="profile-id"></span></h5>
             <h5>Group ID: <span id="profile-groupid"></span></h5>
+            <div id="profile-chart"><h4>Financial History:</h4></div>
           </div>
           <div id="tab-2" class="tab mld-cell mdl-cell mdl-cell--1-offset mdl-cell--10-col hidden">
-            <h1>Group</h1>
+            <h1>Group: <span id="group-id"></span></h1>
+            <h3>Members:</h3>
+            <ul id="group-members"></ul>
           </div>
           <div id="tab-3" class="tab mld-cell mdl-cell mdl-cell--1-offset mdl-cell--10-col hidden">
             <h1>Help</h1>
