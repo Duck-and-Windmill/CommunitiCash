@@ -1,3 +1,3 @@
-# PROJECT: IVORY OCTOPUS (aka CommunityCash)
+# PROJECT: IVORY OCTOPUS (aka CommunitiCash)
 
 Communal Insurance App
